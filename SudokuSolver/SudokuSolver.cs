@@ -83,9 +83,9 @@ class SudokuSolver
             //    }
             //}
 
-            Console.WriteLine("Final state: ");
+            Console.WriteLine("\n\nFinal state: ");
             sudoku.PrettyPrint(globalMask);
-            Console.WriteLine($"Total moves: {totalMoves}");
+            Console.WriteLine($"\nTotal moves: {totalMoves}");
 
         }
         catch (Exception e)
