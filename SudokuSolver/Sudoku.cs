@@ -111,7 +111,7 @@ public class Sudoku
 
                 if (isHighlight)
                 {
-                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Red;
                 }
 
                 if (mask.mask[row, col] == 1)

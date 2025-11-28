@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 //Parser leest grid in en maakt een 2d array met 0'en en hardcoded items. een mask bepaald door 0 en 1 welke we mogen verplaatsen
 //Het grid wordt willekeurig ingevuld op alle 0 plekken met missende getallen binnen het 3x3 blok.
@@ -23,6 +24,8 @@ class SudokuSolver
             Mask globalMask = sudoku.mask; //Make a global mask because we will be altering the sudoku state so we need to remember the original sudoku mask.
 
             int totalMoves = 0;
+            int bestScoreSeen = sudoku.score;
+            var solveSteps = new List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)>();
 
             Console.WriteLine("Starting state: ");
             sudoku.PrettyPrint(globalMask);
@@ -32,8 +35,18 @@ class SudokuSolver
                 (sudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
                 //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
                 totalMoves++;
+
+                if (sudoku.score < bestScoreSeen)
+                {
+                    bestScoreSeen = sudoku.score;
+                    solveSteps.Add((sudoku, swapped1, swapped2));
+                }
             }
 
+            foreach (var step in solveSteps)
+            {
+                step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
+            }
 
             //Poging tot dynamisch restarten voor locale maximums, maar het was niet efficient:
 

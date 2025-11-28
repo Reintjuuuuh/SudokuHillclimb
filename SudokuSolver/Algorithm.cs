@@ -18,7 +18,7 @@ public static class Algorithm
         }
         while (swapableIndices.Count < 2);
 
-        var nextSudokus = new List<(Sudoku state, (int row, int col) swap1, (int row, int col) swap2)>();
+        var nextSudokus = new List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)>();
 
         for (int i = 0; i < swapableIndices.Count; i++)
         {
@@ -32,7 +32,7 @@ public static class Algorithm
             }
         }
 
-        return nextSudokus.MinBy(sudoku => sudoku.state.score);
+        return nextSudokus.MinBy(sudoku => sudoku.sudoku.score);
         //Get random block. Filter out indices within the mask
         //Make a list for new sudokus
         //Perform all possible swaps within the block.
