@@ -42,6 +42,41 @@ public class Sudoku
         }
     }
 
+    public int Evaluate()
+    {
+        HashSet<int>[] rows = new HashSet<int>[9];
+        HashSet<int>[] columns = new HashSet<int>[9];
+
+        for (int i = 0; i < 9; i++)
+        {
+            rows[i] = new HashSet<int>();
+            columns[i] = new HashSet<int>();
+        }
+
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                rows[i].Add(grid[i, j]);
+                columns[j].Add(grid[i, j]);
+            }
+        }
+
+        int score = 0;
+
+        foreach (var hashSet in rows)
+        {
+            score += 9 - hashSet.Count;
+        }
+
+        foreach (var hashSet in columns)
+        {
+            score += 9 - hashSet.Count;
+        }
+
+        return score;
+        //maak 18 lijsten (9 rijen en 9 kolommen). Ga over elke lijst en verwijder elementen uit een 1 t/m 9 lijst. Tel de remainders op.
+    }
     public void PrettyPrint(Mask mask)
     {
         Console.WriteLine();

@@ -30,6 +30,7 @@ class SudokuSolver
             sudoku.PrettyPrint(globalMask);
             sudoku.PrettyPrintBlock(globalMask, SudokuConstants.BottomMiddle);
 
+            Console.WriteLine(sudoku.Evaluate());
             //foreach (var TopLeftIndices in SudokuConstants.Blocks[SudokuConstants.TopLeft])
             //{
             //    Console.WriteLine(sudoku.grid[TopLeftIndices.row, TopLeftIndices.col]);
