@@ -25,6 +25,11 @@ class SudokuSolver
             sudoku.PrettyPrint(globalMask);
             sudoku.PrettyPrintBlock(globalMask, SudokuConstants.BottomMiddle);
 
+            sudoku.FillRandom();
+
+            sudoku.PrettyPrint(globalMask);
+            sudoku.PrettyPrintBlock(globalMask, SudokuConstants.BottomMiddle);
+
             //foreach (var TopLeftIndices in SudokuConstants.Blocks[SudokuConstants.TopLeft])
             //{
             //    Console.WriteLine(sudoku.grid[TopLeftIndices.row, TopLeftIndices.col]);

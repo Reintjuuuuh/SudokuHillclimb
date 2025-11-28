@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Sudoku
 {
@@ -15,15 +17,42 @@ public class Sudoku
 
     public void FillRandom()
     {
+        //extract all numbers in a 3x3 block. Fill the remaining numbers with the missing ones
+        for (int i = 0; i < 9; i++) //for all 9 blocks
+        {
+            var indices = SudokuConstants.Blocks[i];
 
+            List<int> allNums = new List<int> { 1,2,3,4,5,6,7,8,9 };
+
+            foreach (var index in indices)
+            {
+                int num = grid[index.row, index.col];
+                allNums.Remove(num);
+            }
+
+            var remainingNums = new Queue<int>(allNums); //maybe add randomization later. Just by shuffling the list before creating the queue; shouldnt be too difficult. Not necessarily needed for the assignment tho
+
+            foreach (var index in indices)
+            {
+                if (grid[index.row, index.col] == 0)
+                {
+                    grid[index.row, index.col] = remainingNums.Dequeue();
+                }
+            }
+        }
     }
 
     public void PrettyPrint(Mask mask)
     {
+        Console.WriteLine();
+
         Console.BackgroundColor = ConsoleColor.White;
         Console.ForegroundColor = ConsoleColor.Black;
 
-        Console.WriteLine("\n +-------+-------+-------+ ");
+        Console.Write(" +-------+-------+-------+ ");
+        Console.BackgroundColor = ConsoleColor.Black;  //yes this is weird, but its needed for when a console want to print and has to scroll to do so
+        Console.WriteLine();
+        Console.BackgroundColor = ConsoleColor.White;
         for (int row = 0; row < 9; row++)
         {
             Console.Write(" | ");
@@ -33,16 +62,24 @@ public class Sudoku
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                 }
-                
+
                 Console.Write($"{grid[row, col].ToString()} ");
 
                 Console.ForegroundColor = ConsoleColor.Black;
 
-                if ((col + 1) % 3 == 0) Console.Write("| "); 
+                if ((col + 1) % 3 == 0) Console.Write("| ");
             }
+            Console.BackgroundColor = ConsoleColor.Black;  //same here
             Console.WriteLine();
+            Console.BackgroundColor = ConsoleColor.White;
 
-            if ((row + 1) % 3 == 0) Console.WriteLine(" +-------+-------+-------+ ");
+            if ((row + 1) % 3 == 0)
+            {
+                Console.Write(" +-------+-------+-------+ ");
+                Console.BackgroundColor = ConsoleColor.Black; //same here
+                Console.WriteLine();
+                Console.BackgroundColor = ConsoleColor.White;
+            }
         }
 
         Console.ResetColor();
@@ -57,7 +94,10 @@ public class Sudoku
         Console.BackgroundColor = ConsoleColor.White;
         Console.ForegroundColor = ConsoleColor.Black;
 
-        Console.WriteLine("+-------+");
+        Console.Write("+-------+");
+        Console.BackgroundColor = ConsoleColor.Black;  //same here
+        Console.WriteLine();
+        Console.BackgroundColor = ConsoleColor.White;
         for (int i = 0; i < indices.Length; i++)
         {
             if ((i + 3) % 3 == 0) Console.Write("| ");
@@ -71,9 +111,18 @@ public class Sudoku
 
             Console.ForegroundColor = ConsoleColor.Black;
 
-            if ((i + 1) % 3 == 0) Console.WriteLine("|");
+            if ((i + 1) % 3 == 0)
+            {
+                Console.Write("|");
+                Console.BackgroundColor = ConsoleColor.Black;  //same here
+                Console.WriteLine();
+                Console.BackgroundColor = ConsoleColor.White;
+            }
         }
-        Console.WriteLine("+-------+");
+        Console.Write("+-------+");
+        Console.BackgroundColor = ConsoleColor.Black;  //same here
+        Console.WriteLine();
+        Console.BackgroundColor = ConsoleColor.White;
 
         Console.ResetColor();
     }
