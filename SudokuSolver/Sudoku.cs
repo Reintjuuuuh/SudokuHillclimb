@@ -86,7 +86,7 @@ public class Sudoku
         return score;
     }
 
-    public void PrettyPrint(Mask mask)
+    public void PrettyPrint(Mask mask, (int row, int col)? highlight1 = null, (int row, int col)? highlight2 = null)
     {
         Console.WriteLine();
 
@@ -102,13 +102,26 @@ public class Sudoku
             Console.Write(" | ");
             for (int col = 0; col < 9; col++)
             {
+                bool isHighlight = false;
+                if (highlight1 != null && highlight2 != null)
+                {
+                    isHighlight = highlight1.Value.row == row && highlight1.Value.col == col
+                               || highlight2.Value.row == row && highlight2.Value.col == col;
+                }
+
+                if (isHighlight)
+                {
+                    Console.BackgroundColor = ConsoleColor.Red;
+                }
+
                 if (mask.mask[row, col] == 1)
                 {
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                 }
 
                 Console.Write($"{grid[row, col].ToString()} ");
-
+                
+                Console.BackgroundColor = ConsoleColor.White;
                 Console.ForegroundColor = ConsoleColor.Black;
 
                 if ((col + 1) % 3 == 0) Console.Write("| ");

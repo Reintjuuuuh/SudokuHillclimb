@@ -15,27 +15,65 @@ class SudokuSolver
     static void Main(String[] args)
     {
         Console.WriteLine("Please input the sudoku grid: ");
-        
+        string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
+
         try
         {
-            //Sudoku sudoku = new Sudoku(Console.ReadLine());
-            Sudoku sudoku = new Sudoku("0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0");
+            Sudoku sudoku = new Sudoku(input);
             Mask globalMask = sudoku.mask; //Make a global mask because we will be altering the sudoku state so we need to remember the original sudoku mask.
 
+            int totalMoves = 0;
+
+            Console.WriteLine("Starting state: ");
             sudoku.PrettyPrint(globalMask);
-            //sudoku.PrettyPrintBlock(globalMask, SudokuConstants.BottomMiddle);
 
             while (sudoku.score != 0)
             {
-                sudoku = Algorithm.Iteration(sudoku, globalMask);
+                (sudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
+                //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
+                totalMoves++;
             }
 
-            sudoku.PrettyPrint(globalMask);
 
-            //foreach (var TopLeftIndices in SudokuConstants.Blocks[SudokuConstants.TopLeft])
+            //Poging tot dynamisch restarten voor locale maximums, maar het was niet efficient:
+
+            //Sudoku sudoku = new Sudoku(input);
+            //Mask globalMask = sudoku.mask; //Make a global mask because we will be altering the sudoku state so we need to remember the original sudoku mask.
+
+            //int totalMoves = 0;
+            //int movesSinceLastImprovement = 0;
+            //int bestScoreSeen = sudoku.score;
+            //int maxMovesStuck = 20000;
+
+            //Console.WriteLine("Starting state: ");
+            //sudoku.PrettyPrint(globalMask);
+
+            //while (sudoku.score != 0)
             //{
-            //    Console.WriteLine(sudoku.grid[TopLeftIndices.row, TopLeftIndices.col]);
+            //    (sudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
+            //    //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
+            //    totalMoves++;
+            //    movesSinceLastImprovement++;
+
+            //    if (sudoku.score < bestScoreSeen)
+            //    {
+            //        bestScoreSeen = sudoku.score;
+            //        movesSinceLastImprovement = 0;
+            //        Console.WriteLine($"New best score: {sudoku.score}");
+            //    }
+
+            //    if (movesSinceLastImprovement > maxMovesStuck)
+            //    {
+            //        sudoku = new Sudoku(input);
+            //        movesSinceLastImprovement = 0;
+            //        bestScoreSeen = sudoku.score;
+            //    }
             //}
+
+            Console.WriteLine("Final state: ");
+            sudoku.PrettyPrint(globalMask);
+            Console.WriteLine($"Total moves: {totalMoves}");
+
         }
         catch (Exception e)
         {
