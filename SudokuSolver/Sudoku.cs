@@ -1,20 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 public class Sudoku
 {
     public int[,] grid = new int[9, 9]; //2d array in the form of row column. So index [3,8] is the fourth row and nineth column.
-
+    public int score;
+    public Mask mask;
+    
     public Sudoku(string input)
     {
         this.grid = SudokuParser.ParseSudokuGrid(input);
+        this.GenerateMask();
+        this.FillRandom();
+        this.score = CalculateFullScore(); //we know the fillrandom function only gets
     }
-    public Sudoku(int[,] grid) //needed for creating new sudoku objects after swapping two indices.
+    public Sudoku(int[,] grid, int score) //needed for creating new sudoku objects after swapping two indices.
     {
         this.grid = grid;
+        this.score = score;
     }
 
+    public void GenerateMask()
+    {
+        this.mask = new Mask(this);
+    }
     public void FillRandom()
     {
         //extract all numbers in a 3x3 block. Fill the remaining numbers with the missing ones
@@ -42,7 +51,7 @@ public class Sudoku
         }
     }
 
-    public int Evaluate()
+    public int CalculateFullScore() //should only have to be called ONCE in the entire program. It calculates the score of the initial board. After this we just update the score based on what row/column gets swapped
     {
         HashSet<int>[] rows = new HashSet<int>[9];
         HashSet<int>[] columns = new HashSet<int>[9];
@@ -75,8 +84,8 @@ public class Sudoku
         }
 
         return score;
-        //maak 18 lijsten (9 rijen en 9 kolommen). Ga over elke lijst en verwijder elementen uit een 1 t/m 9 lijst. Tel de remainders op.
     }
+
     public void PrettyPrint(Mask mask)
     {
         Console.WriteLine();
