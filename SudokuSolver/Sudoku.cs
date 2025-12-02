@@ -14,8 +14,9 @@ public class Sudoku
         this.FillRandom();
         this.score = CalculateFullScore(); //we know the fillrandom function only gets
     }
-    public Sudoku(int[,] grid, int score) //needed for creating new sudoku objects after swapping two indices.
+    public Sudoku(Mask mask, int[,] grid, int score) //needed for creating new sudoku objects after swapping two indices.
     {
+        this.mask = mask;
         this.grid = grid;
         this.score = score;
     }

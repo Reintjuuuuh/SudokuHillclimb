@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 class SudokuSolver
 {
-    static string Solve(string input, int walkSize = 3, int walkTrigger = 20)
+    static List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)> Solve(string input, int walkSize = 3, int walkTrigger = 20)
     {
         Sudoku sudoku = new Sudoku(input);
         Mask globalMask = sudoku.mask; //Make a global mask because we will be altering the sudoku state so we need to remember the original sudoku mask.
@@ -25,14 +25,13 @@ class SudokuSolver
         string output = "";
 
         output += "Starting state: \n";
-        sudoku.PrettyPrint(globalMask);
+        //sudoku.PrettyPrint(globalMask);
 
 
         int movesSinceLastImprovement = 0;
         while (sudoku.score != 0)
         {
-            (Sudoku tempsudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
-            //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
+            (Sudoku tempsudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku);
             totalMoves++;
 
             if (tempsudoku.score <= bestScoreSeen)
@@ -48,7 +47,7 @@ class SudokuSolver
             else if (movesSinceLastImprovement > walkTrigger)
             {
                 movesSinceLastImprovement = 0;
-                var boardList = Algorithm.RandomWalk(sudoku, globalMask, walkSize);
+                var boardList = Algorithm.RandomWalk(sudoku, walkSize);
                 (sudoku, _, _) = boardList[^1];
                 foreach (var board in boardList)
                 {
@@ -60,16 +59,18 @@ class SudokuSolver
                 movesSinceLastImprovement++;
             }
         }
-
+        /*
         foreach (var step in solveSteps)
         {
             step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
         }
-
+        
         Console.WriteLine("\n\nFinal state: ");
         sudoku.PrettyPrint(globalMask);
         Console.WriteLine($"\nTotal moves: {totalMoves}");
         return output;
+        */
+        return solveSteps;
     }
 
     static void Main(String[] args)
@@ -83,7 +84,20 @@ class SudokuSolver
 
         try
         {
-            Console.Write(Solve(input));
+            var solveSteps = Solve(input);
+            Console.WriteLine("Starting state:");
+            (var firstBoard, _, _) = solveSteps[0];
+            (var solvedBoard, _, _) = solveSteps[^1];
+            var globalMask = firstBoard.mask;
+            Console.WriteLine(globalMask);
+            foreach (var step in solveSteps)
+            {
+                step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
+            }
+
+            Console.WriteLine("\n\nFinal state: ");
+            solvedBoard.PrettyPrint(globalMask);
+            Console.WriteLine($"\nTotal moves: {solveSteps.Count}");
         }
         catch (Exception e)
         {
