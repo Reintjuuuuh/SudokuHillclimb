@@ -13,6 +13,58 @@ using System.Collections.Generic;
 
 class SudokuSolver
 {
+    static string Solve(string input, int walkSize = 3, int walkTrigger = 20)
+    {
+        Sudoku sudoku = new Sudoku(input);
+        Mask globalMask = sudoku.mask; //Make a global mask because we will be altering the sudoku state so we need to remember the original sudoku mask.
+
+        int totalMoves = 0;
+        int bestScoreSeen = sudoku.score;
+        var solveSteps = new List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)>();
+
+        string output = "";
+
+        output += "Starting state: \n";
+        sudoku.PrettyPrint(globalMask);
+
+
+        int movesSinceLastImprovement = 0;
+        while (sudoku.score != 0)
+        {
+            (sudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
+            //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
+            totalMoves++;
+            movesSinceLastImprovement++;
+
+            if (sudoku.score < bestScoreSeen)
+            {
+                movesSinceLastImprovement = 0;
+                bestScoreSeen = sudoku.score;
+                solveSteps.Add((sudoku, swapped1, swapped2));
+            }
+            if (movesSinceLastImprovement > walkTrigger)
+            {
+                movesSinceLastImprovement = 0;
+                var boardList = Algorithm.RandomWalk(sudoku, globalMask, walkSize);
+                (sudoku, _, _) = boardList[^1];
+                foreach (var board in boardList)
+                {
+                    solveSteps.Add(board);
+                }
+            }
+        }
+
+        foreach (var step in solveSteps)
+        {
+            step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
+        }
+
+        Console.WriteLine("\n\nFinal state: ");
+        sudoku.PrettyPrint(globalMask);
+        Console.WriteLine($"\nTotal moves: {totalMoves}");
+        return output;
+    }
+
     static void Main(String[] args)
     {
         Console.WriteLine("Please input the sudoku grid: ");
@@ -24,51 +76,7 @@ class SudokuSolver
 
         try
         {
-            Sudoku sudoku = new Sudoku(input);
-            Mask globalMask = sudoku.mask; //Make a global mask because we will be altering the sudoku state so we need to remember the original sudoku mask.
-
-            int totalMoves = 0;
-            int bestScoreSeen = sudoku.score;
-            var solveSteps = new List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)>();
-
-            Console.WriteLine("Starting state: ");
-            sudoku.PrettyPrint(globalMask);
-            int movesSinceLastImprovement = 0;
-
-            while (sudoku.score != 0)
-            {
-                (sudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
-                //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
-                totalMoves++;
-                movesSinceLastImprovement++;
-
-                if (sudoku.score < bestScoreSeen)
-                {
-                    movesSinceLastImprovement = 0;
-                    bestScoreSeen = sudoku.score;
-                    solveSteps.Add((sudoku, swapped1, swapped2));
-                }
-                if (movesSinceLastImprovement > 20)
-                {
-                    movesSinceLastImprovement = 0;
-                    var boardList = Algorithm.RandomWalk(sudoku, globalMask, walkSize);
-                    (sudoku, _, _) = boardList[^1];
-                    foreach (var board in boardList)
-                    {
-                        solveSteps.Add(board);
-                    }
-                }
-            }
-                
-            foreach (var step in solveSteps)
-            {
-                step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
-            }
-
-            Console.WriteLine("\n\nFinal state: ");
-            sudoku.PrettyPrint(globalMask);
-            Console.WriteLine($"\nTotal moves: {totalMoves}");
-                
+            Console.Write(Solve(input));
         }
         catch (Exception e)
         {
