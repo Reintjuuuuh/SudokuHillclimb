@@ -16,7 +16,9 @@ class SudokuSolver
     static void Main(String[] args)
     {
         Console.WriteLine("Please input the sudoku grid: ");
-        string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
+        string input = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
+        //string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
+        int walkSize = 3;
 
         try
         {
@@ -29,68 +31,47 @@ class SudokuSolver
 
             Console.WriteLine("Starting state: ");
             sudoku.PrettyPrint(globalMask);
+            int movesSinceLastImprovement = 0;
 
             while (sudoku.score != 0)
             {
                 (sudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
                 //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
                 totalMoves++;
+                movesSinceLastImprovement++;
 
                 if (sudoku.score < bestScoreSeen)
                 {
+                    movesSinceLastImprovement = 0;
                     bestScoreSeen = sudoku.score;
                     solveSteps.Add((sudoku, swapped1, swapped2));
                 }
+                if (movesSinceLastImprovement > 20)
+                {
+                    movesSinceLastImprovement = 0;
+                    var boardList = Algorithm.RandomWalk(sudoku, globalMask, plateaus);
+                    (sudoku, _, _) = boardList[^1];
+                    foreach (var board in boardList)
+                    {
+                        solveSteps.Add(board);
+                    }
+                }
             }
-
+                
             foreach (var step in solveSteps)
             {
                 step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
             }
 
-            //Poging tot dynamisch restarten voor locale maximums, maar het was niet efficient:
-
-            //Sudoku sudoku = new Sudoku(input);
-            //Mask globalMask = sudoku.mask; //Make a global mask because we will be altering the sudoku state so we need to remember the original sudoku mask.
-
-            //int totalMoves = 0;
-            //int movesSinceLastImprovement = 0;
-            //int bestScoreSeen = sudoku.score;
-            //int maxMovesStuck = 20000;
-
-            //Console.WriteLine("Starting state: ");
-            //sudoku.PrettyPrint(globalMask);
-
-            //while (sudoku.score != 0)
-            //{
-            //    (sudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
-            //    //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
-            //    totalMoves++;
-            //    movesSinceLastImprovement++;
-
-            //    if (sudoku.score < bestScoreSeen)
-            //    {
-            //        bestScoreSeen = sudoku.score;
-            //        movesSinceLastImprovement = 0;
-            //        Console.WriteLine($"New best score: {sudoku.score}");
-            //    }
-
-            //    if (movesSinceLastImprovement > maxMovesStuck)
-            //    {
-            //        sudoku = new Sudoku(input);
-            //        movesSinceLastImprovement = 0;
-            //        bestScoreSeen = sudoku.score;
-            //    }
-            //}
-
             Console.WriteLine("\n\nFinal state: ");
             sudoku.PrettyPrint(globalMask);
             Console.WriteLine($"\nTotal moves: {totalMoves}");
-
+                
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
+        
     }
 }
