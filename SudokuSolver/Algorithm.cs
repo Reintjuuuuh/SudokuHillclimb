@@ -7,8 +7,30 @@ public static class Algorithm
     private static readonly Random rng = new Random();
     //Get random block, perform one iteration which returns a list of all possible swap states, and pick the best one
 
-    public static (Sudoku, (int row, int col), (int row, int col)) Iteration(Sudoku sudoku, Mask mask)
+    // More efficient for randomWalk, maybe remove later
+    public static (Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2) getPossibleBoard(Sudoku sudoku, Mask mask)
     {
+        List<(int row, int col)> swapableIndices;
+
+        do
+        {
+            var indices = SudokuConstants.Blocks[rng.Next(0, 9)];
+            swapableIndices = indices.Where(index => mask.mask[index.row, index.col] == 0).ToList();
+        }
+        while (swapableIndices.Count < 2);
+        var index1 = swapableIndices[rng.Next(swapableIndices.Count)];
+        var index2 = swapableIndices[rng.Next(swapableIndices.Count)];
+
+        Sudoku newState = Swap(sudoku, index1, index2);
+        return (newState, index1, index2);
+
+    }
+
+    public static List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)> getPossibleBoards(Sudoku sudoku, Mask mask)
+    {
+        //Get random block. Filter out indices within the mask
+        //Make a list for new sudokus
+        //Perform all possible swaps within the block.
         List<(int row, int col)> swapableIndices;
 
         do
@@ -19,6 +41,7 @@ public static class Algorithm
         while (swapableIndices.Count < 2);
 
         var nextSudokus = new List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)>();
+        nextSudokus.Add((sudoku, (0, 0), (0, 0)));
 
         for (int i = 0; i < swapableIndices.Count; i++)
         {
@@ -31,11 +54,29 @@ public static class Algorithm
                 nextSudokus.Add((newState, index1, index2));
             }
         }
+        return nextSudokus;
+    }
+    
+    public static List<(Sudoku, (int row, int col), (int row, int col))> RandomWalk(Sudoku sudoku, Mask mask, int length)
+    {
+        
+        var path = new List<(Sudoku, (int row, int col), (int row, int col))>();
+        List<(Sudoku, (int row, int col), (int row, int col))> nextSudokus;
+        for (int i = 0; i < length; i++) {
+            path.Add(getPossibleBoard(sudoku, mask));
+        }
+        return path;
+    }
 
-        return nextSudokus.MinBy(sudoku => sudoku.sudoku.score);
-        //Get random block. Filter out indices within the mask
-        //Make a list for new sudokus
-        //Perform all possible swaps within the block.
+    public static (Sudoku, (int row, int col), (int row, int col)) Iteration(Sudoku sudoku, Mask mask)
+    {
+        var nextSudokus = getPossibleBoards(sudoku, mask);
+        
+        var minScore = nextSudokus.Min(s => s.sudoku.score);
+        var lowestScored = nextSudokus.Where(s => s.sudoku.score == minScore).ToList();
+
+        return lowestScored[rng.Next(lowestScored.Count)];
+
     }
 
     public static Sudoku Swap(Sudoku sudoku, (int row, int col) field1, (int row, int col) field2)

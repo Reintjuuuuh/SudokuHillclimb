@@ -6,7 +6,7 @@ public static class SudokuParser
     {
         string[] inputArray = input.Split(" ");
 
-        if (inputArray.Length != 81) { throw new Exception("Input does not have 81 entries. Try adding zero's for empty spaces."); }
+        if (inputArray.Length != 81) { throw new Exception("Input does not have 81 entries. Try adding zeroes for empty spaces."); }
 
         int[,] result = new int[9, 9];
 
