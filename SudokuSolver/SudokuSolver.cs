@@ -31,18 +31,21 @@ class SudokuSolver
         int movesSinceLastImprovement = 0;
         while (sudoku.score != 0)
         {
-            (sudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
+            (Sudoku tempsudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku, globalMask);
             //sudoku.PrettyPrint(globalMask, swapped1, swapped2);
             totalMoves++;
-            movesSinceLastImprovement++;
 
-            if (sudoku.score < bestScoreSeen)
+            if (tempsudoku.score <= bestScoreSeen)
             {
-                movesSinceLastImprovement = 0;
-                bestScoreSeen = sudoku.score;
+                sudoku = tempsudoku;
                 solveSteps.Add((sudoku, swapped1, swapped2));
+                if (sudoku.score < bestScoreSeen)
+                {
+                    movesSinceLastImprovement = 0;
+                    bestScoreSeen = sudoku.score;
+                }
             }
-            if (movesSinceLastImprovement > walkTrigger)
+            else if (movesSinceLastImprovement > walkTrigger)
             {
                 movesSinceLastImprovement = 0;
                 var boardList = Algorithm.RandomWalk(sudoku, globalMask, walkSize);
@@ -51,6 +54,10 @@ class SudokuSolver
                 {
                     solveSteps.Add(board);
                 }
+            }
+            else
+            {
+                movesSinceLastImprovement++;
             }
         }
 
