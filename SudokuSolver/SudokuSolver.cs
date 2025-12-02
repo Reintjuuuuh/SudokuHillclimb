@@ -49,7 +49,7 @@ class SudokuSolver
                 if (movesSinceLastImprovement > 20)
                 {
                     movesSinceLastImprovement = 0;
-                    var boardList = Algorithm.RandomWalk(sudoku, globalMask, plateaus);
+                    var boardList = Algorithm.RandomWalk(sudoku, globalMask, walkSize);
                     (sudoku, _, _) = boardList[^1];
                     foreach (var board in boardList)
                     {
