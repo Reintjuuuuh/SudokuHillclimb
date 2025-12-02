@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 //Parser leest grid in en maakt een 2d array met 0'en en hardcoded items. een mask bepaald door 0 en 1 welke we mogen verplaatsen
 //Het grid wordt willekeurig ingevuld op alle 0 plekken met missende getallen binnen het 3x3 blok.
@@ -16,17 +18,10 @@ class SudokuSolver
     static List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)> Solve(string input, int walkSize = 3, int walkTrigger = 20)
     {
         Sudoku sudoku = new Sudoku(input);
-        Mask globalMask = sudoku.mask; //Make a global mask because we will be altering the sudoku state so we need to remember the original sudoku mask.
 
         int totalMoves = 0;
         int bestScoreSeen = sudoku.score;
         var solveSteps = new List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)>();
-
-        string output = "";
-
-        output += "Starting state: \n";
-        //sudoku.PrettyPrint(globalMask);
-
 
         int movesSinceLastImprovement = 0;
         while (sudoku.score != 0)
@@ -46,6 +41,13 @@ class SudokuSolver
             }
             else if (movesSinceLastImprovement > walkTrigger)
             {
+                walkSize++;
+                // DEBUG
+                if (walkSize > 50)
+                {
+                    Console.WriteLine($"{walkSize}, {totalMoves}");
+                }
+                // END DEBUG
                 movesSinceLastImprovement = 0;
                 var boardList = Algorithm.RandomWalk(sudoku, walkSize);
                 (sudoku, _, _) = boardList[^1];
@@ -59,18 +61,24 @@ class SudokuSolver
                 movesSinceLastImprovement++;
             }
         }
-        /*
+
+        return solveSteps;
+    }
+    public static void PrettyPrintSolution(List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)> solveSteps)
+    {
+        Console.WriteLine("Starting state:");
+        (var firstBoard, _, _) = solveSteps[0];
+        (var solvedBoard, _, _) = solveSteps[^1];
+        var globalMask = firstBoard.mask;
+        Console.WriteLine(globalMask);
         foreach (var step in solveSteps)
         {
             step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
         }
-        
+
         Console.WriteLine("\n\nFinal state: ");
-        sudoku.PrettyPrint(globalMask);
-        Console.WriteLine($"\nTotal moves: {totalMoves}");
-        return output;
-        */
-        return solveSteps;
+        solvedBoard.PrettyPrint(globalMask);
+        Console.WriteLine($"\nTotal moves: {solveSteps.Count}");
     }
 
     static void Main(String[] args)
@@ -80,29 +88,26 @@ class SudokuSolver
         //string input = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
         //string input = Console.ReadLine();
         string input = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
-        int walkSize = 3;
 
         try
         {
-            var solveSteps = Solve(input);
-            Console.WriteLine("Starting state:");
-            (var firstBoard, _, _) = solveSteps[0];
-            (var solvedBoard, _, _) = solveSteps[^1];
-            var globalMask = firstBoard.mask;
-            Console.WriteLine(globalMask);
-            foreach (var step in solveSteps)
-            {
-                step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
+            List <int> solveStepsCounter = new List<int>();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            for (int i = 0; i < 100; i++)
+            {                
+                solveStepsCounter.Add(Solve(input).Count);
+                Console.WriteLine($"Average amount of moves: {solveStepsCounter.AsParallel().Sum() / solveStepsCounter.Count}. Average amount of time to solve (ms): {stopwatch.ElapsedMilliseconds / solveStepsCounter.Count}");
             }
+           
 
-            Console.WriteLine("\n\nFinal state: ");
-            solvedBoard.PrettyPrint(globalMask);
-            Console.WriteLine($"\nTotal moves: {solveSteps.Count}");
+
+
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
-        
     }
+
 }
