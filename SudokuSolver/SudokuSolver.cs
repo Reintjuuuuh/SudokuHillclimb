@@ -41,11 +41,11 @@ class SudokuSolver
             }
             else if (movesSinceLastImprovement > walkTrigger)
             {
-                walkSize++;
+
                 // DEBUG
-                if (walkSize > 50)
+                if (totalMoves > 50000)
                 {
-                    Console.WriteLine($"{walkSize}, {totalMoves}");
+                    Console.WriteLine($"{walkSize}, {totalMoves}, {sudoku.score}");
                 }
                 // END DEBUG
                 movesSinceLastImprovement = 0;

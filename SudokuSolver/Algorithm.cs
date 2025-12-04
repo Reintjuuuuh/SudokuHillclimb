@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 public static class Algorithm
 {
@@ -59,11 +60,11 @@ public static class Algorithm
     
     public static List<(Sudoku, (int row, int col), (int row, int col))> RandomWalk(Sudoku sudoku, int length)
     {
-        
         var path = new List<(Sudoku, (int row, int col), (int row, int col))>();
-        List<(Sudoku, (int row, int col), (int row, int col))> nextSudokus;
+        
         for (int i = 0; i < length; i++) {
-            path.Add(getPossibleBoard(sudoku));
+            (sudoku, var s1, var s2) = getPossibleBoard(sudoku);
+            path.Add((sudoku, s1, s2));
         }
         return path;
     }
