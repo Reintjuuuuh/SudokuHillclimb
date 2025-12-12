@@ -7,7 +7,7 @@ using System.Linq;
 
 class SudokuSolver
 {
-    static List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)> Solve(string input, int walkSize = 1, int walkTrigger = 400, bool optimizedWalk = true)
+    static List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)> Solve(string input, int walkSize = 3, int walkTrigger = 25, bool optimizedWalk = true)
         // For our optimized walk, the walkTrigger needs to be sufficiently high to not keep resetting the optimizedWalkSize.
     {
         Sudoku sudoku = new Sudoku(input);
@@ -93,13 +93,13 @@ class SudokuSolver
     static void Main(String[] args)
     {
         
-        //Console.WriteLine("What is the path to the sudoku?");
-        //string input = File.ReadAllText(Console.ReadLine());
-        //string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
-        string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
+        Console.WriteLine("What is the path to the sudoku?");
+        string input = File.ReadAllText(Console.ReadLine());
+       
         try
         {
-            PrettyPrintSolution(Solve(input));
+            for (int i = 0; i < 100; i++)
+                Console.WriteLine(Solve(input).Count);
         }
         catch (Exception e)
         {
