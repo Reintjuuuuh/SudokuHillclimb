@@ -104,7 +104,6 @@ class SudokuSolver
             for (int i = 0; i < 10; i++)
             {                
                 solveStepsCounter.Add(Solve(input).Count);
-                
             }
             Console.WriteLine($"Average amount of moves: {solveStepsCounter.AsParallel().Sum() / solveStepsCounter.Count}. Average amount of time to solve (ms): {stopwatch.ElapsedMilliseconds / solveStepsCounter.Count}");
 
