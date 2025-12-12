@@ -98,18 +98,7 @@ class SudokuSolver
         string input = File.ReadAllText(Console.ReadLine());
         try
         {
-            List <int> solveStepsCounter = new List<int>();
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            for (int i = 0; i < 10; i++)
-            {                
-                solveStepsCounter.Add(Solve(input).Count);
-            }
-            Console.WriteLine($"Average amount of moves: {solveStepsCounter.AsParallel().Sum() / solveStepsCounter.Count}. Average amount of time to solve (ms): {stopwatch.ElapsedMilliseconds / solveStepsCounter.Count}");
-
-
-
-
+            PrettyPrintSolution(Solve(input));
         }
         catch (Exception e)
         {
