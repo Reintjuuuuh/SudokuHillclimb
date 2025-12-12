@@ -18,14 +18,15 @@ class SudokuSolver
         solveSteps.Add((sudoku, null, null));
 
         int movesSinceLastImprovement = 0;
-        int plateauLevel = 0;
+        // optimizedWalk only
+        int plateauLevel = 0;  // The level at which a local maximum is. if the code stays at the same plateauLevel for multiple randomwalks, the amount of steps (optimizedWalkSize) will increase.
         int optimizedWalkSize = walkSize;
 
         while (sudoku.score != 0)
         {
             (Sudoku tempsudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku);
             totalMoves++;
-
+            // Only add moves that improve or equal the current heuristic.
             if (tempsudoku.score <= bestScoreSeen)
             {
                 sudoku = tempsudoku;
@@ -39,7 +40,7 @@ class SudokuSolver
             else if (movesSinceLastImprovement > walkTrigger)
             {
                 List<(Sudoku, (int row, int col), (int row, int col))> boardList;
-                if (optimizedWalk)
+                if (optimizedWalk) // Dynamic walk size. If the algorithm stays on the same plateu, the amount of steps in the randomwalk will increase.
                 {
                     if (sudoku.score != plateauLevel)
                     {
@@ -56,6 +57,7 @@ class SudokuSolver
                 {
                     boardList = Algorithm.RandomWalk(sudoku, walkSize);
                 }
+                // In a randomwalk, all steps are added, no matter if the result is better or not.
                 (sudoku, _, _) = boardList[^1];
                 foreach (var board in boardList)
                 {
@@ -74,12 +76,12 @@ class SudokuSolver
     }
     public static void PrettyPrintSolution(List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)> solveSteps)
     {
+        // Pretty print for bonus points :)
         Console.WriteLine("Starting state:");
         (var firstBoard, _, _) = solveSteps[0];
         (var solvedBoard, _, _) = solveSteps[^1];
         var globalMask = firstBoard.mask;
 
-        //Console.WriteLine(globalMask);
         foreach (var step in solveSteps)
         {
             step.sudoku.PrettyPrint(globalMask, step.swap1, step.swap2);
