@@ -98,8 +98,7 @@ class SudokuSolver
        
         try
         {
-            for (int i = 0; i < 100; i++)
-                Console.WriteLine(Solve(input).Count);
+            PrettyPrintSolution(Solve(input));
         }
         catch (Exception e)
         {
