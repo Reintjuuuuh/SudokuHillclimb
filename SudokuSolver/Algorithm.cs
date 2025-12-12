@@ -30,13 +30,14 @@ public static class Algorithm
 
     public static List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)> getPossibleBoards(Sudoku sudoku)
     {
-        //Get random block. Filter out indices within the mask
+
+
         //Make a list for new sudokus
-        //Perform all possible swaps within the block.
         List<(int row, int col)> swapableIndices;
 
         do
         {
+            //Get random block. Filter out indices within the mask
             var indices = SudokuConstants.Blocks[rng.Next(0, 9)];
             swapableIndices = indices.Where(index => sudoku.mask.mask[index.row, index.col] == 0).ToList();
         }
@@ -54,7 +55,7 @@ public static class Algorithm
                 {
                     index2 = swapableIndices[rng.Next(swapableIndices.Count)]; // otherwise there's a 1/9 chance that it'll swap one piece with itself
                 }
-
+                //Perform all possible swaps within the block.
                 Sudoku newState = Swap(sudoku, index1, index2);
                 nextSudokus.Add((newState, index1, index2));
             }
