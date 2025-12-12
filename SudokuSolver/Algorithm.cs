@@ -6,9 +6,7 @@ using System.Security.Cryptography;
 public static class Algorithm
 {
     private static readonly Random rng = new Random();
-    //Get random block, perform one iteration which returns a list of all possible swap states, and pick the best one
-
-    // More efficient for randomWalk, maybe remove later
+    // More efficient for randomWalk, especially in large walks. Reduces the overhead by 9x
     public static (Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2) getPossibleBoard(Sudoku sudoku)
     {
         List<(int row, int col)> swapableIndices;
@@ -21,6 +19,9 @@ public static class Algorithm
         while (swapableIndices.Count < 2);
         var index1 = swapableIndices[rng.Next(swapableIndices.Count)];
         var index2 = swapableIndices[rng.Next(swapableIndices.Count)];
+        while (index1 == index2) {
+            index2 = swapableIndices[rng.Next(swapableIndices.Count)]; // otherwise there's a 1/9 chance that it'll swap one piece with itself
+        }
 
         Sudoku newState = Swap(sudoku, index1, index2);
         return (newState, index1, index2);
@@ -40,9 +41,8 @@ public static class Algorithm
             swapableIndices = indices.Where(index => sudoku.mask.mask[index.row, index.col] == 0).ToList();
         }
         while (swapableIndices.Count < 2);
-
+        
         var nextSudokus = new List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)>();
-        //nextSudokus.Add((sudoku, (0, 0), (0, 0)));
 
         for (int i = 0; i < swapableIndices.Count; i++)
         {
@@ -50,6 +50,10 @@ public static class Algorithm
             {
                 var index1 = swapableIndices[i];
                 var index2 = swapableIndices[j];
+                while (index1 == index2)
+                {
+                    index2 = swapableIndices[rng.Next(swapableIndices.Count)]; // otherwise there's a 1/9 chance that it'll swap one piece with itself
+                }
 
                 Sudoku newState = Swap(sudoku, index1, index2);
                 nextSudokus.Add((newState, index1, index2));
@@ -61,27 +65,26 @@ public static class Algorithm
     public static List<(Sudoku, (int row, int col), (int row, int col))> RandomWalk(Sudoku sudoku, int length)
     {
         var path = new List<(Sudoku, (int row, int col), (int row, int col))>();
-        
         for (int i = 0; i < length; i++) {
-            (sudoku, var s1, var s2) = getPossibleBoard(sudoku);
+            // replace the original sudoku with the new selected one, add it to the path, repeat i times.
+            (sudoku, var s1, var s2) = getPossibleBoard(sudoku); 
             path.Add((sudoku, s1, s2));
         }
         return path;
     }
 
     public static (Sudoku, (int row, int col), (int row, int col)) Iteration(Sudoku sudoku)
-    {
+    {   // Find all boards with the best (lowest) score, and select a random one of them, to prevent immediately getting stuck in loops.
         var nextSudokus = getPossibleBoards(sudoku);
-        
+           
         var minScore = nextSudokus.Min(s => s.sudoku.score);
         var lowestScored = nextSudokus.Where(s => s.sudoku.score == minScore).ToList();
 
         return lowestScored[rng.Next(lowestScored.Count)];
-
     }
 
     public static Sudoku Swap(Sudoku sudoku, (int row, int col) field1, (int row, int col) field2)
-    {
+    {   // creates a new Sudoku object with two fields swapped, and updated scores.
         int[,] resultGrid = (int[,])sudoku.grid.Clone();
         int resultScore = sudoku.score - GetPenalty(sudoku.grid, field1, field2);
 
@@ -95,7 +98,7 @@ public static class Algorithm
     }
 
     public static int GetPenalty(int[,] grid, (int row, int col) field1, (int row, int col) field2)
-    {
+    {   // Calculate the penalty of one move. The total score is kept within the penalty object, changed in Swap()
         int penalty = 0;
 
         penalty += CalculateRowPenalty(grid, field1.row);
