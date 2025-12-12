@@ -4,19 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-//Parser leest grid in en maakt een 2d array met 0'en en hardcoded items. een mask bepaald door 0 en 1 welke we mogen verplaatsen
-//Het grid wordt willekeurig ingevuld op alle 0 plekken met missende getallen binnen het 3x3 blok.
-//search algoritme -> kies 1 van de 9 blokken,
-//Maak een lijst  met nieuwe sudoku objecten waarin
-//kies de beste door op elk in de lijst de evaluatiefunctie uit te voeren.
-
-//Parsing en invullen tot sudoku object
-//Algoritme
-//Evaluatiefunctie
 
 class SudokuSolver
 {
-    static List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)> Solve(string input, int walkSize = 3, int walkTrigger = 4500, bool optimizedWalk = false)
+    static List<(Sudoku sudoku, (int row, int col) swap1, (int row, int col) swap2)> Solve(string input, int walkSize = 1, int walkTrigger = 400, bool optimizedWalk = true)
         // For our optimized walk, the walkTrigger needs to be sufficiently high to not keep resetting the optimizedWalkSize.
     {
         Sudoku sudoku = new Sudoku(input);
@@ -58,7 +49,6 @@ class SudokuSolver
                     {
                         optimizedWalkSize++;
                     }
-                    // debug; Console.WriteLine($"{sudoku.score}, {optimizedWalkSize}, {solveSteps.Count}");
                     boardList = Algorithm.RandomWalk(sudoku, optimizedWalkSize);
                 }
                 else
@@ -103,9 +93,6 @@ class SudokuSolver
 
     static void Main(String[] args)
     {
-        //string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
-        //string input = "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0";
-        //string input = Console.ReadLine();
         
         Console.WriteLine("What is the path to the sudoku?");
         string input = File.ReadAllText(Console.ReadLine());
