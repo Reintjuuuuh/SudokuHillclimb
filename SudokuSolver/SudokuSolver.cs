@@ -71,6 +71,8 @@ class SudokuSolver
         Console.WriteLine($"\nTotal moves: {solveSteps.Count}");
         Console.WriteLine($"\nPrint solution steps? (y/n)");
         if (Console.ReadLine() == "y") PrettyPrintSolution(solveSteps);
+        Console.WriteLine($"\nSolve another sudoku? (y/n)");
+        if (Console.ReadLine() == "y") Main(new string[0] {});
         return solveSteps;
     }
     public static void PrettyPrintSolution(List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)> solveSteps)
