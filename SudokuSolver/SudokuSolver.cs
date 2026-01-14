@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sudoku_Namespace;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -103,14 +104,22 @@ class SudokuSolver
         Console.WriteLine($"\nTotal moves: {solveSteps.Count}");
     }
 
-    static void Main(String[] args)
+       
+    public static void Main(String[] args)
     {
-        //string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
+        string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
         Console.WriteLine("What is the path to the sudoku?");
-        string input = File.ReadAllText(Console.ReadLine());
+        //string input = File.ReadAllText(Console.ReadLine());
         try
         {
-            Solve(input);
+            var solved = Backtracking.Solve(input);
+            if (solved != null)
+            { solved.PrettyPrint(solved.mask); }
+               
+                
+            else
+                Console.WriteLine("joever");
+            //Solve(input, true);
             //PrettyPrintSolution(Solve(input));
         }
         catch (Exception e)

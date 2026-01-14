@@ -6,12 +6,12 @@ public class Sudoku
     public int[,] grid = new int[9, 9]; //2d array in the form of row column. So index [3,8] is the fourth row and nineth column.
     public int score;
     public Mask mask;
-    
-    public Sudoku(string input)
+
+    public Sudoku(string input, bool fill = false)
     {
         this.grid = SudokuParser.ParseSudokuGrid(input);
         this.GenerateMask();
-        this.FillRandom();
+        if (fill) { this.FillRandom(); }
         this.score = CalculateFullScore(); //we know the fillrandom function only gets
     }
     public Sudoku(Mask mask, int[,] grid, int score) //needed for creating new sudoku objects after swapping two indices.
@@ -32,7 +32,7 @@ public class Sudoku
         {
             var indices = SudokuConstants.Blocks[i];
 
-            List<int> allNums = new List<int> { 1,2,3,4,5,6,7,8,9 };
+            List<int> allNums = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
             foreach (var index in indices)
             {
@@ -121,7 +121,7 @@ public class Sudoku
                 }
 
                 Console.Write($"{grid[row, col].ToString()} ");
-                
+
                 Console.BackgroundColor = ConsoleColor.White;
                 Console.ForegroundColor = ConsoleColor.Black;
 
