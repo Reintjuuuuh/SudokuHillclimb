@@ -112,7 +112,7 @@ class SudokuSolver
         //string input = File.ReadAllText(Console.ReadLine());
         try
         {
-            var solved = Backtracking.Solve(input);
+            var solved = ForwardChecking.Solve(input);
             if (solved != null)
             { solved.PrettyPrint(solved.mask); }
                
