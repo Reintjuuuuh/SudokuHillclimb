@@ -130,7 +130,9 @@ class SudokuSolver
         if (Console.ReadLine() == "y")
         {
             Tester tester = new Tester();
-            tester.runTest();
+            // these are the .txt that are read from the file "input"
+            string[] testInput = new string[] { "grid1.txt", "grid2.txt", "grid3.txt", "grid4.txt", "grid5.txt", "difficult.txt" };
+            tester.runTest(testInput);
         }
     }
 }

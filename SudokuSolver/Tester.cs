@@ -20,35 +20,41 @@ namespace Sudoku_Namespace
         private TimeSpan[] timeStampsFC;
         private TimeSpan[] timeStampsFCMCV;
 
-        public void runTest()
+        public void runTest(string[] fileNames)
         {
-            inputFiles = new string[] { "grid1.txt", "grid2.txt", "grid3.txt", "grid4.txt", "grid5.txt" };
+            // fileNames are the .txt that are read from the file "input"
+            inputFiles = fileNames;
             inputAmount = inputFiles.Length;
 
-            readTestCases();
+            input = readGivenFiles();
 
             timeStampsILS = new TimeSpan[inputAmount];
             timeStampsCBT = new TimeSpan[inputAmount];
             timeStampsFC = new TimeSpan[inputAmount];
             timeStampsFCMCV = new TimeSpan[inputAmount];
 
+            // solve each sudoku, with each algorithm
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             for (int i = 0; i < inputAmount; i++)
             {
+                // Test: Iterated Local Search
                 //SudokuSolver ILS = new SudokuSolver();
                 long ILSStart = Stopwatch.GetTimestamp();
                 //ILS.Solve(input[i]);
                 timeStampsILS[i] = Stopwatch.GetElapsedTime(ILSStart);
-                
+
+                // Test: Chronological Backtracking
                 long CBTStart = Stopwatch.GetTimestamp();
                 var CBTSolved = Backtracking.Solve(input[i]);
                 timeStampsCBT[i] = Stopwatch.GetElapsedTime(CBTStart);
 
+                // Test: Forward Checking
                 long FCStart = Stopwatch.GetTimestamp();
                 var FCSolved = ForwardChecking.Solve(input[i]);
                 timeStampsFC[i] = Stopwatch.GetElapsedTime(FCStart);
 
+                // Test: Forward Checking most-constrained-variable (MCV) heuristiek
                 long FCMCVStart = Stopwatch.GetTimestamp();
                 //var FCMCVSolved = ;
                 timeStampsFCMCV[i] = Stopwatch.GetElapsedTime(FCMCVStart);
@@ -57,20 +63,15 @@ namespace Sudoku_Namespace
             printTestRes();
         }
 
-        private void readTestCases()
-        {
-            input = readAllFiles();
-        }
-
-        private string[] readAllFiles()
+        private string[] readGivenFiles()
         {
             string basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "input\\");
-            string[] inputs = new string[inputAmount];
+            string[] res = new string[inputAmount];
             for (int i = 0; i < inputAmount; i++)
             {
-                inputs[i] = File.ReadAllText(basePath + inputFiles[i]);
+                res[i] = File.ReadAllText(basePath + inputFiles[i]);
             }
-            return inputs;
+            return res;
         }
 
         private void printTestRes()
