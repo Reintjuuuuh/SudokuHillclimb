@@ -15,6 +15,7 @@ namespace Sudoku_Namespace
         private string[] inputFiles;
         private string[] input;
         private int inputAmount;
+        private TimeSpan[] timeStampILS;
         private TimeSpan[] timeStampsCBT;
         private TimeSpan[] timeStampsFC;
         private TimeSpan[] timeStampsFCMCV;
@@ -26,6 +27,7 @@ namespace Sudoku_Namespace
 
             readTestCases();
 
+            timeStampILS = new TimeSpan[inputAmount];
             timeStampsCBT = new TimeSpan[inputAmount];
             timeStampsFC = new TimeSpan[inputAmount];
             timeStampsFCMCV = new TimeSpan[inputAmount];
@@ -34,16 +36,21 @@ namespace Sudoku_Namespace
             stopwatch.Start();
             for (int i = 0; i < inputAmount; i++)
             {
+                //SudokuSolver ILS = new SudokuSolver();
+                long ILSStart = Stopwatch.GetTimestamp();
+                //ILS.Solve(input[i]);
+                timeStampILS[i] = Stopwatch.GetElapsedTime(ILSStart);
+                
                 long CBTStart = Stopwatch.GetTimestamp();
-                var CBTsolved = Backtracking.Solve(input[i]);
+                var CBTSolved = Backtracking.Solve(input[i]);
                 timeStampsCBT[i] = Stopwatch.GetElapsedTime(CBTStart);
 
                 long FCStart = Stopwatch.GetTimestamp();
-                var FCsolved = ForwardChecking.Solve(input[i]);
+                var FCSolved = ForwardChecking.Solve(input[i]);
                 timeStampsFC[i] = Stopwatch.GetElapsedTime(FCStart);
 
                 long FCMCVStart = Stopwatch.GetTimestamp();
-                //var FCMCVsolved = ;
+                //var FCMCVSolved = ;
                 timeStampsFCMCV[i] = Stopwatch.GetElapsedTime(FCMCVStart);
             }
 
@@ -70,15 +77,22 @@ namespace Sudoku_Namespace
         {
             Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "Head",
                 inputFiles[0], inputFiles[1], inputFiles[2], inputFiles[3], inputFiles[4]);
+            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "ILS",
+                timeStampILS[0].Microseconds + "ms", timeStampILS[1].Microseconds + "ms", 
+                timeStampILS[2].Microseconds + "ms", timeStampILS[3].Microseconds + "ms", 
+                timeStampILS[4].Microseconds + "ms");
             Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "CBT",
-                timeStampsCBT[0].Microseconds, timeStampsCBT[1].Microseconds, timeStampsCBT[2].Microseconds,
-                timeStampsCBT[3].Microseconds, timeStampsCBT[4].Microseconds);
+                timeStampsCBT[0].Microseconds + "ms", timeStampsCBT[1].Microseconds + "ms", 
+                timeStampsCBT[2].Microseconds + "ms", timeStampsCBT[3].Microseconds + "ms", 
+                timeStampsCBT[4].Microseconds + "ms");
             Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "FC",
-                timeStampsFC[0].Microseconds, timeStampsFC[1].Microseconds, timeStampsFC[2].Microseconds,
-                timeStampsFC[3].Microseconds, timeStampsFC[4].Microseconds);
+                timeStampsFC[0].Microseconds + "ms", timeStampsFC[1].Microseconds + "ms", 
+                timeStampsFC[2].Microseconds + "ms", timeStampsFC[3].Microseconds + "ms", 
+                timeStampsFC[4].Microseconds + "ms");
             Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "FCMCV",
-                timeStampsFCMCV[0].Microseconds, timeStampsFCMCV[1].Microseconds, timeStampsFCMCV[2].Microseconds,
-                timeStampsFCMCV[3].Microseconds, timeStampsFCMCV[4].Microseconds);
+                timeStampsFCMCV[0].Microseconds + "ms", timeStampsFCMCV[1].Microseconds + "ms", 
+                timeStampsFCMCV[2].Microseconds + "ms", timeStampsFCMCV[3].Microseconds + "ms", 
+                timeStampsFCMCV[4].Microseconds + "ms");
         }
     }
 }
