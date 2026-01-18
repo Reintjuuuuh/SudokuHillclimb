@@ -59,7 +59,7 @@ namespace Sudoku_Namespace
         {
             string basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "input\\");
             string[] inputs = new string[inputAmount];
-            for(int i = 0; i < inputAmount; i++)
+            for (int i = 0; i < inputAmount; i++)
             {
                 inputs[i] = File.ReadAllText(basePath + inputFiles[i]);
             }
@@ -68,10 +68,10 @@ namespace Sudoku_Namespace
 
         private void printTestRes()
         {
-            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "Head", 
+            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "Head",
                 inputFiles[0], inputFiles[1], inputFiles[2], inputFiles[3], inputFiles[4]);
-            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "CBT", 
-                timeStampsCBT[0].Microseconds, timeStampsCBT[1].Microseconds, timeStampsCBT[2].Microseconds, 
+            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "CBT",
+                timeStampsCBT[0].Microseconds, timeStampsCBT[1].Microseconds, timeStampsCBT[2].Microseconds,
                 timeStampsCBT[3].Microseconds, timeStampsCBT[4].Microseconds);
             Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "FC",
                 timeStampsFC[0].Microseconds, timeStampsFC[1].Microseconds, timeStampsFC[2].Microseconds,
@@ -79,32 +79,6 @@ namespace Sudoku_Namespace
             Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "FCMCV",
                 timeStampsFCMCV[0].Microseconds, timeStampsFCMCV[1].Microseconds, timeStampsFCMCV[2].Microseconds,
                 timeStampsFCMCV[3].Microseconds, timeStampsFCMCV[4].Microseconds);
-
-            //Console.WriteLine("Head     " + combineHead(inputFiles));
-            //Console.WriteLine("CBT      " + combineRes(timeStampsCBT));
-            //Console.WriteLine("FC       " + combineRes(timeStampsFC));
-            //Console.WriteLine("FCMCV    " + combineRes(timeStampsFCMCV));
-        }
-
-        private string combineHead(string[] inputHead)
-        {
-            string res = "";
-            foreach (string head in inputHead)
-            {
-                res += head + "     ";
-            }
-            return res;
-        }
-
-
-        private string combineRes(TimeSpan[] timeStamps)
-        {
-            string res = "";
-            foreach (TimeSpan timeStamp in timeStamps)
-            {
-                res += timeStamp.Microseconds.ToString() + "     ";
-            }
-            return res;
         }
     }
 }
