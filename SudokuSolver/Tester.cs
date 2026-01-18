@@ -15,7 +15,7 @@ namespace Sudoku_Namespace
         private string[] inputFiles;
         private string[] input;
         private int inputAmount;
-        private TimeSpan[] timeStampILS;
+        private TimeSpan[] timeStampsILS;
         private TimeSpan[] timeStampsCBT;
         private TimeSpan[] timeStampsFC;
         private TimeSpan[] timeStampsFCMCV;
@@ -27,7 +27,7 @@ namespace Sudoku_Namespace
 
             readTestCases();
 
-            timeStampILS = new TimeSpan[inputAmount];
+            timeStampsILS = new TimeSpan[inputAmount];
             timeStampsCBT = new TimeSpan[inputAmount];
             timeStampsFC = new TimeSpan[inputAmount];
             timeStampsFCMCV = new TimeSpan[inputAmount];
@@ -39,7 +39,7 @@ namespace Sudoku_Namespace
                 //SudokuSolver ILS = new SudokuSolver();
                 long ILSStart = Stopwatch.GetTimestamp();
                 //ILS.Solve(input[i]);
-                timeStampILS[i] = Stopwatch.GetElapsedTime(ILSStart);
+                timeStampsILS[i] = Stopwatch.GetElapsedTime(ILSStart);
                 
                 long CBTStart = Stopwatch.GetTimestamp();
                 var CBTSolved = Backtracking.Solve(input[i]);
@@ -75,24 +75,39 @@ namespace Sudoku_Namespace
 
         private void printTestRes()
         {
-            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "Head",
-                inputFiles[0], inputFiles[1], inputFiles[2], inputFiles[3], inputFiles[4]);
-            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "ILS",
-                timeStampILS[0].Microseconds + "ms", timeStampILS[1].Microseconds + "ms", 
-                timeStampILS[2].Microseconds + "ms", timeStampILS[3].Microseconds + "ms", 
-                timeStampILS[4].Microseconds + "ms");
-            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "CBT",
-                timeStampsCBT[0].Microseconds + "ms", timeStampsCBT[1].Microseconds + "ms", 
-                timeStampsCBT[2].Microseconds + "ms", timeStampsCBT[3].Microseconds + "ms", 
-                timeStampsCBT[4].Microseconds + "ms");
-            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "FC",
-                timeStampsFC[0].Microseconds + "ms", timeStampsFC[1].Microseconds + "ms", 
-                timeStampsFC[2].Microseconds + "ms", timeStampsFC[3].Microseconds + "ms", 
-                timeStampsFC[4].Microseconds + "ms");
-            Console.WriteLine("{0,5} {1,10} {2,10} {3,10} {4,10} {5,10}", "FCMCV",
-                timeStampsFCMCV[0].Microseconds + "ms", timeStampsFCMCV[1].Microseconds + "ms", 
-                timeStampsFCMCV[2].Microseconds + "ms", timeStampsFCMCV[3].Microseconds + "ms", 
-                timeStampsFCMCV[4].Microseconds + "ms");
+            string printFormat = "{0,10} ";
+            for (int i = 0; i < inputAmount; i++)
+            {
+                printFormat += $"{{{i+1},15}} ";
+            }
+
+            Console.WriteLine(printFormat, combineHead(inputFiles));
+            Console.WriteLine(printFormat, combineRes("ILS", timeStampsILS));
+            Console.WriteLine(printFormat, combineRes("CBT", timeStampsCBT));
+            Console.WriteLine(printFormat, combineRes("FC", timeStampsFC));
+            Console.WriteLine(printFormat, combineRes("FCMCV", timeStampsFCMCV));
+        }
+
+        private string[] combineHead(string[] heads)
+        {
+            string[] res = new string[inputAmount + 1];
+            res[0] = "Algorithm";
+            for (int i = 0;i < inputAmount; i++)
+            {
+                res[i + 1] = heads[i];
+            }
+            return res;
+        }
+
+        private string[] combineRes(string name, TimeSpan[] timeStamps)
+        {
+            string[] res = new string[inputAmount + 1];
+            res[0] = name;
+            for (int i = 0; i < inputAmount; i++)
+            {
+                res[i + 1] = timeStamps[i].Microseconds + "ms";
+            }
+            return res;
         }
     }
 }
