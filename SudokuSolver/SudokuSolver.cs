@@ -21,7 +21,7 @@ class SudokuSolver
         }
         else if (input == "s")
         {
-            Console.WriteLine("Give one-by-one the txt-file names placed 'input' to be solved:");
+            Console.WriteLine("Give one-by-one the txt-file names placed 'input' to be solved. Add an empty line when done.");
 
             while (true)
             {
@@ -37,7 +37,11 @@ class SudokuSolver
             string contents = File.ReadAllText(fileName);
             var solved = ForwardChecking.Solve(contents);
             if (solved != null)
+            {
+                Console.WriteLine();
+                Console.WriteLine($"{Path.GetFileName(fileName)}: "); // get truncated file name
                 solved.PrettyPrint(solved.mask);
+            }
             else
                 Console.WriteLine("Can't be solved.");
         }
