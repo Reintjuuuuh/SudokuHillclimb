@@ -35,7 +35,7 @@ namespace Sudoku_Namespace
                 SudokuSolver ILS = new SudokuSolver();
                 long ILSStart = Stopwatch.GetTimestamp();
                 bool solved = (ILS.Solve(content, stopwatch:new Stopwatch(), timeout:timeout) != null); // We have added a stopwatch, because in theory the ILS can get stuck forever in a local maximum.
-                timeStampsILS.Add(solved ? Stopwatch.GetElapsedTime(ILSStart): TimeSpan.FromMicroseconds(-1));
+                timeStampsILS.Add(solved ? Stopwatch.GetElapsedTime(ILSStart): TimeSpan.FromMilliseconds(-1));
                 
                 // Test: Chronological Backtracking
                 long CBTStart = Stopwatch.GetTimestamp();
@@ -90,8 +90,8 @@ namespace Sudoku_Namespace
 
             for (int i = startIndex; i < startIndex + count; i++)
             {
-                if (times[i].TotalMicroseconds == -1)
-                    Console.Write($"{0,15}", $">{timeout * 1000} µs");
+                if (times[i].TotalMicroseconds < 0)
+                    Console.Write("{0,15}", $">{timeout * 1000} µs");
                 else
                     Console.Write("{0,15}", $"{times[i].TotalMicroseconds:F0} µs");
             }
