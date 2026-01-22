@@ -12,104 +12,85 @@ namespace Sudoku_Namespace
 {
     internal class Tester
     {
-        private string[] inputFiles;
-        private string[] input;
-        private int inputAmount;
-        private TimeSpan[] timeStampsILS;
-        private TimeSpan[] timeStampsCBT;
-        private TimeSpan[] timeStampsFC;
-        private TimeSpan[] timeStampsFCMCV;
+        private List<TimeSpan> timeStampsILS = new();
+        private List<TimeSpan> timeStampsCBT = new();
+        private List<TimeSpan> timeStampsFC = new();
+        private List<TimeSpan> timeStampsFCMCV = new();
 
-        public void runTest(string[] fileNames)
+        public void runTest(List<String> fileNames)
         {
-            // fileNames are the .txt that are read from the file "input"
-            inputFiles = fileNames;
-            inputAmount = inputFiles.Length;
-
-            input = readGivenFiles();
-
-            timeStampsILS = new TimeSpan[inputAmount];
-            timeStampsCBT = new TimeSpan[inputAmount];
-            timeStampsFC = new TimeSpan[inputAmount];
-            timeStampsFCMCV = new TimeSpan[inputAmount];
 
             // solve each sudoku, with each algorithm
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            for (int i = 0; i < inputAmount; i++)
+            foreach (string fileName in fileNames)
             {
+                var content = File.ReadAllText(fileName);
+                //Console.WriteLine(input[i]);
                 // Test: Iterated Local Search
                 //SudokuSolver ILS = new SudokuSolver();
                 long ILSStart = Stopwatch.GetTimestamp();
                 //ILS.Solve(input[i]);
-                timeStampsILS[i] = Stopwatch.GetElapsedTime(ILSStart);
+                timeStampsILS.Add(Stopwatch.GetElapsedTime(ILSStart));
 
                 // Test: Chronological Backtracking
                 long CBTStart = Stopwatch.GetTimestamp();
-                var CBTSolved = Backtracking.Solve(input[i]);
-                timeStampsCBT[i] = Stopwatch.GetElapsedTime(CBTStart);
+                var CBTSolved = Backtracking.Solve(content);
+                timeStampsCBT.Add(Stopwatch.GetElapsedTime(CBTStart));
 
                 // Test: Forward Checking
                 long FCStart = Stopwatch.GetTimestamp();
-                var FCSolved = ForwardChecking.Solve(input[i]);
-                timeStampsFC[i] = Stopwatch.GetElapsedTime(FCStart);
+                var FCSolved = ForwardChecking.Solve(content);
+                timeStampsFC.Add(Stopwatch.GetElapsedTime(FCStart));
 
                 // Test: Forward Checking most-constrained-variable (MCV) heuristics
                 long FCMCVStart = Stopwatch.GetTimestamp();
-                var FCMCVSolved = ForwardChecking.Solve(input[i], true); ;
-                timeStampsFCMCV[i] = Stopwatch.GetElapsedTime(FCMCVStart);
+                var FCMCVSolved = ForwardChecking.Solve(content, true);
+                timeStampsFCMCV.Add(Stopwatch.GetElapsedTime(FCMCVStart));
             }
 
-            printTestRes();
+            printTestRes(fileNames);
         }
-
-        private string[] readGivenFiles()
+        private void printTestRes(List<string> inputFiles)
         {
-            // All files should be in this input folder.
-            string basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "input\\");
-            string[] res = new string[inputAmount];
-            for (int i = 0; i < inputAmount; i++)
+            int w = Console.WindowWidth;
+            int filesPerBlock = (w - 10) / 15;
+            for (int i = 0; i < inputFiles.Count; i += filesPerBlock)
             {
-                res[i] = File.ReadAllText(basePath + inputFiles[i]);
+                int count = Math.Min(filesPerBlock, inputFiles.Count - i);
+                var fileBlock = inputFiles.Skip(i).Take(count).ToList();
+                Console.WriteLine(); // extra newline
+
+                // Header
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write("{0,-10}", "");
+                foreach (var file in fileBlock)
+                {
+                    Console.Write("{0,15}", Path.GetFileName(file)); // remove the ../../../
+                }
+                Console.WriteLine();
+                Console.ResetColor();
+
+                // Rows
+                PrintRowBlock("CBT", timeStampsCBT, i, count, ConsoleColor.Red);
+                PrintRowBlock("FC", timeStampsFC, i, count, ConsoleColor.Yellow);
+                PrintRowBlock("FCMCV", timeStampsFCMCV, i, count, ConsoleColor.Green);
             }
-            return res;
         }
 
-        private void printTestRes()
+        private void PrintRowBlock(string name, List<TimeSpan> times, int startIndex, int count, ConsoleColor color)
         {
-            string printFormat = "{0,10} ";
-            for (int i = 0; i < inputAmount; i++)
+            Console.ForegroundColor = color;
+            Console.Write("{0,-10}", name);
+
+            for (int i = startIndex; i < startIndex + count; i++)
             {
-                printFormat += $"{{{i+1},15}} ";
+                Console.Write("{0,15}", $"{times[i].TotalMicroseconds:F0} µs");
             }
 
-            Console.WriteLine(printFormat, combineHead(inputFiles));
-            Console.WriteLine(printFormat, combineRes("ILS", timeStampsILS));
-            Console.WriteLine(printFormat, combineRes("CBT", timeStampsCBT));
-            Console.WriteLine(printFormat, combineRes("FC", timeStampsFC));
-            Console.WriteLine(printFormat, combineRes("FCMCV", timeStampsFCMCV));
+            Console.WriteLine();
+            Console.ResetColor();
         }
 
-        private string[] combineHead(string[] heads)
-        {
-            string[] res = new string[inputAmount + 1];
-            res[0] = "Algorithm";
-            for (int i = 0;i < inputAmount; i++)
-            {
-                res[i + 1] = heads[i];
-            }
-            return res;
-        }
-
-        private string[] combineRes(string name, TimeSpan[] timeStamps)
-        {
-            string[] res = new string[inputAmount + 1];
-            res[0] = name;
-            for (int i = 0; i < inputAmount; i++)
-            {
-                res[i + 1] = timeStamps[i].Microseconds + "μs";
-            }
-            return res;
-        }
     }
 }

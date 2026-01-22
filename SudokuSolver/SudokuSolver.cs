@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
 
@@ -10,23 +11,31 @@ class SudokuSolver
 {
     public static void Main(String[] args)
     {
-        Console.WriteLine("Do you want to solve one or multiple Sudokus? Type a number:");
-        int n = int.Parse(Console.ReadLine());
-
-        string[] fileNames = new string[n];
-        Tester tester = new Tester();
-        
-        Console.WriteLine("Give one-by-one the txt-file names placed 'input' to be solved:");
-        for (int i = 0; i < n; i++)
-            fileNames[i] = Console.ReadLine();
-
-        string basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "input\\");
-
-        // Solve and print solution.
-        for (int i = 0; i < n; i++)
+        List<String> fileNames = new List<string>();
+        Console.WriteLine("Do you want to run all tests, or select tests? (a/s)");
+        string input = Console.ReadLine().ToLower();
+        if (input == "a")
         {
-            string input = File.ReadAllText(basePath + fileNames[i]);
-            var solved = ForwardChecking.Solve(input);
+            foreach (string file in Directory.EnumerateFiles("..\\..\\..\\input\\", "*.txt"))
+                fileNames.Add(file);
+        }
+        else if (input == "s")
+        {
+            Console.WriteLine("Give one-by-one the txt-file names placed 'input' to be solved:");
+
+            while (true)
+            {
+                var x = Console.ReadLine();
+                if (x.Length == 0) { break; }
+                fileNames.Add("..\\..\\..\\input\\" + x);
+            }   
+        }
+
+        // Initially solve and print solution.
+        foreach (var fileName in fileNames)
+        {
+            string contents = File.ReadAllText(fileName);
+            var solved = ForwardChecking.Solve(contents);
             if (solved != null)
                 solved.PrettyPrint(solved.mask);
             else
@@ -34,20 +43,12 @@ class SudokuSolver
         }
 
         // Run and print test results.
+        Tester tester = new Tester();
         tester.runTest(fileNames);
 
         Console.WriteLine("Go again? (y/n)");
         if (Console.ReadLine() == "y")
             Main(new string[0] { });
-
-        // This is to show an example of running tests.
-        Console.WriteLine("Run default tests? (y/n)");
-        if (Console.ReadLine() == "y")
-        {
-            // these are the .txt that are read from the file "input"
-            string[] testInput = new string[] { "grid1.txt", "grid2.txt", "grid3.txt", "grid4.txt", "grid5.txt", "difficult.txt" };
-            tester.runTest(testInput);
-        }
     }
 
     public List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)> Solve(string input, int walkSize = 7, int walkTrigger = 300, bool optimizedWalk = true)
