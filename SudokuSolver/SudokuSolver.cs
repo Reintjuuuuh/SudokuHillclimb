@@ -126,7 +126,7 @@ class SudokuSolver
         {
             Console.WriteLine(e);
         }
-        Console.WriteLine("Runt tests? (y/n)");
+        Console.WriteLine("Run tests? (y/n)");
         if (Console.ReadLine() == "y")
         {
             Tester tester = new Tester();

@@ -106,7 +106,7 @@ namespace Sudoku_Namespace
             res[0] = name;
             for (int i = 0; i < inputAmount; i++)
             {
-                res[i + 1] = timeStamps[i].Microseconds + "ms";
+                res[i + 1] = timeStamps[i].Microseconds + "μs";
             }
             return res;
         }
