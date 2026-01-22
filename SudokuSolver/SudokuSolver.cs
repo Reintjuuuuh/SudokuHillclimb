@@ -51,9 +51,11 @@ class SudokuSolver
             Main(new string[0] { });
     }
 
-    public List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)> Solve(string input, int walkSize = 7, int walkTrigger = 300, bool optimizedWalk = true)
+    public List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)>? Solve(string input, int walkSize = 7, int walkTrigger = 300, bool optimizedWalk = true, bool interactive = false, Stopwatch? stopwatch
+ = null, int timeout = 0)
     {
-        Sudoku sudoku = new Sudoku(input);
+        if (stopwatch != null) { stopwatch.Start(); }
+        Sudoku sudoku = new Sudoku(input, true);
 
         int totalMoves = 0;
         int bestScoreSeen = sudoku.score;
@@ -67,6 +69,9 @@ class SudokuSolver
 
         while (sudoku.score != 0)
         {
+            if (stopwatch != null && stopwatch.ElapsedMilliseconds > timeout) { 
+                return null; 
+            }
             (Sudoku tempsudoku, var swapped1, var swapped2) = Algorithm.Iteration(sudoku);
             totalMoves++;
             // Only add moves that improve or equal the current heuristic.
@@ -114,19 +119,21 @@ class SudokuSolver
                 movesSinceLastImprovement++;
             }
         }
-        Console.WriteLine($"\nTotal moves: {solveSteps.Count}");
-        (var firstBoard, _, _) = solveSteps[0];
-        (var solvedBoard, _, _) = solveSteps[^1];
-        var globalMask = firstBoard.mask;
-        Console.WriteLine("\n\nFinal state: ");
-        solvedBoard.PrettyPrint(globalMask);
+        if (interactive)
+        {
+            Console.WriteLine($"\nTotal moves: {solveSteps.Count}");
+            (var firstBoard, _, _) = solveSteps[0];
+            (var solvedBoard, _, _) = solveSteps[^1];
+            var globalMask = firstBoard.mask;
+            Console.WriteLine("\n\nFinal state: ");
+            solvedBoard.PrettyPrint(globalMask);
 
-        Console.WriteLine($"\nPrint solution steps? (y/n)");
-        if (Console.ReadLine() == "y") PrettyPrintSolution(solveSteps);
+            Console.WriteLine($"\nPrint solution steps? (y/n)");
+            if (Console.ReadLine() == "y") PrettyPrintSolution(solveSteps);
 
-        Console.WriteLine($"\nSolve another sudoku? (y/n)");
-        if (Console.ReadLine() == "y") Main(new string[0] {});
-
+            Console.WriteLine($"\nSolve another sudoku? (y/n)");
+            if (Console.ReadLine() == "y") Main(new string[0] { });
+        }
         return solveSteps;
     }
     public static void PrettyPrintSolution(List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)> solveSteps)

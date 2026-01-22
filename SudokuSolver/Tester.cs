@@ -6,16 +6,20 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sudoku_Namespace
 {
+
     internal class Tester
     {
         private List<TimeSpan> timeStampsILS = new();
         private List<TimeSpan> timeStampsCBT = new();
         private List<TimeSpan> timeStampsFC = new();
         private List<TimeSpan> timeStampsFCMCV = new();
+        private int timeout = 300; // timeout for ILS in ms
+
 
         public void runTest(List<String> fileNames)
         {
@@ -26,13 +30,13 @@ namespace Sudoku_Namespace
             foreach (string fileName in fileNames)
             {
                 var content = File.ReadAllText(fileName);
-                //Console.WriteLine(input[i]);
-                // Test: Iterated Local Search
-                //SudokuSolver ILS = new SudokuSolver();
-                long ILSStart = Stopwatch.GetTimestamp();
-                //ILS.Solve(input[i]);
-                timeStampsILS.Add(Stopwatch.GetElapsedTime(ILSStart));
 
+                // Test: Iterated Local Search
+                SudokuSolver ILS = new SudokuSolver();
+                long ILSStart = Stopwatch.GetTimestamp();
+                bool solved = (ILS.Solve(content, stopwatch:new Stopwatch(), timeout:timeout) != null); // We have added a stopwatch, because in theory the ILS can get stuck forever in a local maximum.
+                timeStampsILS.Add(solved ? Stopwatch.GetElapsedTime(ILSStart): TimeSpan.FromMicroseconds(-1));
+                
                 // Test: Chronological Backtracking
                 long CBTStart = Stopwatch.GetTimestamp();
                 var CBTSolved = Backtracking.Solve(content);
@@ -72,6 +76,7 @@ namespace Sudoku_Namespace
                 Console.ResetColor();
 
                 // Rows
+                PrintRowBlock("ILS", timeStampsILS, i, count, ConsoleColor.DarkBlue);
                 PrintRowBlock("CBT", timeStampsCBT, i, count, ConsoleColor.Red);
                 PrintRowBlock("FC", timeStampsFC, i, count, ConsoleColor.Yellow);
                 PrintRowBlock("FCMCV", timeStampsFCMCV, i, count, ConsoleColor.Green);
@@ -85,7 +90,10 @@ namespace Sudoku_Namespace
 
             for (int i = startIndex; i < startIndex + count; i++)
             {
-                Console.Write("{0,15}", $"{times[i].TotalMicroseconds:F0} µs");
+                if (times[i].TotalMicroseconds == -1)
+                    Console.Write($"{0,15}", $">{timeout * 1000} µs");
+                else
+                    Console.Write("{0,15}", $"{times[i].TotalMicroseconds:F0} µs");
             }
 
             Console.WriteLine();
