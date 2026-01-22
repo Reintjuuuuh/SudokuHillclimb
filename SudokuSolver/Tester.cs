@@ -65,6 +65,7 @@ namespace Sudoku_Namespace
 
         private string[] readGivenFiles()
         {
+            // All files should be in this input folder.
             string basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "input\\");
             string[] res = new string[inputAmount];
             for (int i = 0; i < inputAmount; i++)

@@ -1,0 +1,16 @@
+Input collections:
+
+5
+grid1.txt
+grid2.txt
+grid3.txt
+grid4.txt
+grid5.txt
+
+6
+21easy.txt
+22medium.txt
+23hard.txt
+24expert.txt
+25master.txt
+26extreme.txt

@@ -12,33 +12,35 @@ class SudokuSolver
     {
         Console.WriteLine("Do you want to solve one or multiple Sudokus? Type a number:");
         int n = int.Parse(Console.ReadLine());
-        string[] fileNames = new string[n];
 
+        string[] fileNames = new string[n];
         Tester tester = new Tester();
+        
         Console.WriteLine("Give one-by-one the txt-file names placed 'input' to be solved:");
         for (int i = 0; i < n; i++)
             fileNames[i] = Console.ReadLine();
 
         string basePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "input\\");
 
+        // Solve and print solution.
         for (int i = 0; i < n; i++)
         {
             string input = File.ReadAllText(basePath + fileNames[i]);
             var solved = ForwardChecking.Solve(input);
             if (solved != null)
-            {
                 solved.PrettyPrint(solved.mask);
-            }
             else
-                Console.WriteLine("joever");
+                Console.WriteLine("Can't be solved.");
         }
 
+        // Run and print test results.
         tester.runTest(fileNames);
 
         Console.WriteLine("Go again? (y/n)");
         if (Console.ReadLine() == "y")
             Main(new string[0] { });
 
+        // This is to show an example of running tests.
         Console.WriteLine("Run default tests? (y/n)");
         if (Console.ReadLine() == "y")
         {
