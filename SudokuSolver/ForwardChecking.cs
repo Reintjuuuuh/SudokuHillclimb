@@ -13,7 +13,7 @@ namespace Sudoku_Namespace
             public int Val;
         }
 
-        public static Sudoku? Solve(string input)
+        public static Sudoku? Solve(string input, bool MCV = false)
         {
             Sudoku sudoku = new Sudoku(input);
 
@@ -39,7 +39,7 @@ namespace Sudoku_Namespace
             if (!MakeNodeConsistent(sudoku, domains)) { return null; } // null -> invalid puzzle
 
             // goofy recursive stuff
-            if (SolveSudoku(sudoku, domains, 0, 0)) { return sudoku; }
+            if (SolveSudoku(sudoku, domains, 0, 0, MCV)) { return sudoku; }
 
             return null; 
         }
@@ -65,22 +65,16 @@ namespace Sudoku_Namespace
             return true;
         }
 
-        private static bool SolveSudoku(Sudoku sudoku, List<int>[,] domains, int row, int col)
+        private static bool SolveSudoku(Sudoku sudoku, List<int>[,] domains, int row, int col, bool MCV)
         {
             if (row == 9) { return true; } // Final row, final column
-            
-            // "next" for the forward checking part
-            int nextRow = row;
-            int nextCol = col + 1;
-            if (nextCol == 9)
-            {
-                nextRow = row + 1;
-                nextCol = 0;
-            }
+
+            //get next row and column to solve
+            (int nextRow, int nextCol) = GetNextCell(sudoku, domains, row, col, MCV);
 
             if (sudoku.grid[row, col] != 0)  // skip taken cells
             {
-                return SolveSudoku(sudoku, domains, nextRow, nextCol);
+                return SolveSudoku(sudoku, domains, nextRow, nextCol, MCV);
             }
 
 
@@ -95,7 +89,7 @@ namespace Sudoku_Namespace
 
                 if (RemoveValueFromPeers(sudoku, domains, row, col, val, history))
                 {
-                    if (SolveSudoku(sudoku, domains, nextRow, nextCol))
+                    if (SolveSudoku(sudoku, domains, nextRow, nextCol, MCV))
                     {
                         return true;
                     }
@@ -111,6 +105,50 @@ namespace Sudoku_Namespace
                 }
             }
             return false;
+        }
+
+        private static (int, int) GetNextCell(Sudoku sudoku, List<int>[,] domains, int row, int col, bool MCV)
+        {
+            int nextRow = -1;
+            int nextCol = -1;
+            int smallestSize = int.MaxValue;
+            if (!MCV) //if most constrained variable is not turned on, we return the next row/column
+            {
+                // "next" for the forward checking part
+                nextRow = row;
+                nextCol = col + 1;
+                if (nextCol == 9)
+                {
+                    nextRow = row + 1;
+                    nextCol = 0;
+                }
+            }
+            else
+            {
+                for (int r = 0; r < 9; r++)
+                {
+                    for (int c = 0; c < 9; c++)
+                    {
+                        if (sudoku.grid[r, c] == 0) //only care about unfilled cells
+                        {
+                            int size = domains[r, c].Count;
+
+                            if (size < smallestSize)
+                            {
+                                smallestSize = size;
+                                nextRow = r; nextCol = c;
+
+                                if (smallestSize <= 1) goto Found; //optimization; impossible to beat
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (smallestSize == int.MaxValue) nextRow = 9; //if no possible domain is found then we return nextrow 9, indicating the algorithm can stop
+
+            Found:
+                return (nextRow, nextCol);
         }
 
         private static bool RemoveValueFromPeers(Sudoku sudoku, List<int>[,] domains, int row, int col, int val, List<Change> history)

@@ -8,6 +8,37 @@ using System.Linq;
 
 class SudokuSolver
 {
+    public static void Main(String[] args)
+    {
+        string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
+        Console.WriteLine("What is the path to the sudoku?");
+        //string input = File.ReadAllText(Console.ReadLine());
+        try
+        {
+            var solved = ForwardChecking.Solve(input);
+            if (solved != null)
+            { 
+                solved.PrettyPrint(solved.mask); 
+            }
+            else
+                Console.WriteLine("joever");
+            //Solve(input, true);
+            //PrettyPrintSolution(Solve(input));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        Console.WriteLine("Run tests? (y/n)");
+        if (Console.ReadLine() == "y")
+        {
+            Tester tester = new Tester();
+            // these are the .txt that are read from the file "input"
+            string[] testInput = new string[] { "grid1.txt", "grid2.txt", "grid3.txt", "grid4.txt", "grid5.txt", "difficult.txt" };
+            tester.runTest(testInput);
+        }
+    }
+
     static List<(Sudoku sudoku, (int row, int col)? swap1, (int row, int col)? swap2)> Solve(string input, int walkSize = 7, int walkTrigger = 300, bool optimizedWalk = true)
     {
         Sudoku sudoku = new Sudoku(input);
@@ -102,37 +133,5 @@ class SudokuSolver
         Console.WriteLine("\n\nFinal state: ");
         solvedBoard.PrettyPrint(globalMask);
         Console.WriteLine($"\nTotal moves: {solveSteps.Count}");
-    }
-
-       
-    public static void Main(String[] args)
-    {
-        string input = "0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0";
-        Console.WriteLine("What is the path to the sudoku?");
-        //string input = File.ReadAllText(Console.ReadLine());
-        try
-        {
-            var solved = ForwardChecking.Solve(input);
-            if (solved != null)
-            { solved.PrettyPrint(solved.mask); }
-               
-                
-            else
-                Console.WriteLine("joever");
-            //Solve(input, true);
-            //PrettyPrintSolution(Solve(input));
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
-        Console.WriteLine("Run tests? (y/n)");
-        if (Console.ReadLine() == "y")
-        {
-            Tester tester = new Tester();
-            // these are the .txt that are read from the file "input"
-            string[] testInput = new string[] { "grid1.txt", "grid2.txt", "grid3.txt", "grid4.txt", "grid5.txt", "difficult.txt" };
-            tester.runTest(testInput);
-        }
     }
 }
