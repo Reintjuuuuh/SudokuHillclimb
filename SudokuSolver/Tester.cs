@@ -70,7 +70,6 @@ namespace Sudoku_Namespace
             for (int i = 0; i < inputAmount; i++)
             {
                 res[i] = File.ReadAllText(basePath + inputFiles[i]);
-                Console.WriteLine(res[i]);
             }
             return res;
         }
