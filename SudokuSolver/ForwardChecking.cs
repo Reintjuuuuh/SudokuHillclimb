@@ -38,8 +38,16 @@ namespace Sudoku_Namespace
             // node consistency
             if (!MakeNodeConsistent(sudoku, domains)) { return null; } // null -> invalid puzzle
 
+            int startRow = 0;
+            int startColumn = 0;
+
+            if (MCV) //if mcv is turned on we dont start at 0,0
+            {
+                (startRow, startColumn) = GetNextCell(sudoku, domains, -1, -1, true);
+            }
+
             // goofy recursive stuff
-            if (SolveSudoku(sudoku, domains, 0, 0, MCV)) { return sudoku; }
+            if (SolveSudoku(sudoku, domains, startRow, startColumn, MCV)) { return sudoku; }
 
             return null; 
         }
@@ -123,7 +131,7 @@ namespace Sudoku_Namespace
                     nextCol = 0;
                 }
             }
-            else
+            else //get the most constained variable
             {
                 for (int r = 0; r < 9; r++)
                 {
@@ -133,7 +141,7 @@ namespace Sudoku_Namespace
                         {
                             int size = domains[r, c].Count;
 
-                            if (size < smallestSize)
+                            if (size < smallestSize) //find the smallest domain. This is the most constrained variable and has to be the next one
                             {
                                 smallestSize = size;
                                 nextRow = r; nextCol = c;
@@ -143,9 +151,8 @@ namespace Sudoku_Namespace
                         }
                     }
                 }
+                if (smallestSize == int.MaxValue) nextRow = 9; //if no possible domain is found then we return nextrow 9, indicating the algorithm can stop
             }
-
-            if (smallestSize == int.MaxValue) nextRow = 9; //if no possible domain is found then we return nextrow 9, indicating the algorithm can stop
 
             Found:
                 return (nextRow, nextCol);

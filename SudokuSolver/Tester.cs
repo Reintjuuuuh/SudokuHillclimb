@@ -56,7 +56,7 @@ namespace Sudoku_Namespace
 
                 // Test: Forward Checking most-constrained-variable (MCV) heuristiek
                 long FCMCVStart = Stopwatch.GetTimestamp();
-                //var FCMCVSolved = ;
+                var FCMCVSolved = ForwardChecking.Solve(input[i], true); ;
                 timeStampsFCMCV[i] = Stopwatch.GetElapsedTime(FCMCVStart);
             }
 
